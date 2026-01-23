@@ -1,0 +1,10 @@
+name: master_detail_navigation
+description: A master detail package for auto_route
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  auto_route: 10.1.2
+
+dev_dependencies:
