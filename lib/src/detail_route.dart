@@ -5,26 +5,70 @@ import 'package:master_detail_navigation/src/responsive_master_detail_data.dart'
 import 'non_exclusive_modal_route.dart';
 
 class DetailRoute<R extends Object> extends CustomRoute<R> {
-  DetailRoute({required super.page, required super.path, super.guards})
-    : super(customRouteBuilder: _buildRoute);
-
-  static Route<T> _buildRoute<T>(
-    BuildContext context,
-    Widget child,
-    AutoRoutePage<T> page,
-  ) {
-    return _DetailPageRoute(builder: (context) => child, settings: page);
+  factory DetailRoute({
+    required PageInfo page,
+    required String path,
+    Duration? transitionDuration,
+    Duration? reverseTransitionDuration,
+    DetailTransitionBuilder? transitionBuilder,
+    List<AutoRouteGuard> guards = const [],
+    bool usesPathAsKey = false,
+  }) {
+    final CustomRouteBuilder customRouteBuilder = <T>(context, child, page) {
+      return _DetailPageRoute<T>(
+        builder: (context) => child,
+        settings: page,
+        transitionDuration: transitionDuration,
+        reverseTransitionDuration: reverseTransitionDuration,
+        transitionBuilder: transitionBuilder,
+      );
+    };
+    return DetailRoute._(
+      page: page,
+      path: path,
+      usesPathAsKey: usesPathAsKey,
+      guards: guards,
+      customRouteBuilder: customRouteBuilder,
+    );
   }
+
+  DetailRoute._({
+    required super.page,
+    required super.path,
+    required super.customRouteBuilder,
+    super.guards,
+    super.usesPathAsKey,
+  });
 
   static bool isPageRoute(Route<dynamic>? route) => route is _DetailPageRoute;
 }
 
+typedef DetailTransitionBuilder =
+    Widget Function(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      WidgetBuilder buildDefaultTransition,
+      Widget child,
+    );
+
 class _DetailPageRoute<T> extends PageRouteBuilder<T>
     with MaterialRouteTransitionMixin<T> {
   final WidgetBuilder builder;
+  final Duration? _transitionDuration;
+  final Duration? _reverseTransitionDuration;
+  final DetailTransitionBuilder? _transitionBuilder;
 
-  _DetailPageRoute({required this.builder, required super.settings})
-    : super(pageBuilder: (context, _, _) => builder(context));
+  _DetailPageRoute({
+    required this.builder,
+    required Duration? transitionDuration,
+    required Duration? reverseTransitionDuration,
+    required DetailTransitionBuilder? transitionBuilder,
+    required super.settings,
+  }) : _transitionDuration = transitionDuration,
+       _reverseTransitionDuration = reverseTransitionDuration,
+       _transitionBuilder = transitionBuilder,
+       super(pageBuilder: (context, _, _) => builder(context));
 
   @override
   DelegatedTransitionBuilder? get delegatedTransition => null;
@@ -35,31 +79,13 @@ class _DetailPageRoute<T> extends PageRouteBuilder<T>
   @override
   bool get opaque => false;
 
-  /*
   @override
-  Duration get transitionDuration {
-    if (navigator == null) return const Duration(milliseconds: 300);
-
-    final layoutType = ResponsiveBreakpoints.of(navigator!.context).layoutType;
-
-    return switch (layoutType) {
-      MasterDetailLayoutType.mobile => const Duration(milliseconds: 300),
-      MasterDetailLayoutType.desktop => Duration.zero,
-    };
-  }
+  Duration get transitionDuration =>
+      _transitionDuration ?? super.transitionDuration;
 
   @override
-  Duration get reverseTransitionDuration {
-    if (navigator == null) return const Duration(milliseconds: 300);
-
-    final layoutType = ResponsiveBreakpoints.of(navigator!.context).layoutType;
-
-    return switch (layoutType) {
-      MasterDetailLayoutType.mobile => const Duration(milliseconds: 300),
-      MasterDetailLayoutType.desktop => Duration.zero,
-    };
-  }
-
+  Duration get reverseTransitionDuration =>
+      _reverseTransitionDuration ?? super.reverseTransitionDuration;
 
   @override
   Widget buildTransitions(
@@ -68,23 +94,20 @@ class _DetailPageRoute<T> extends PageRouteBuilder<T>
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    if (UniversalPlatform.isWeb) {
-      return child;
-    }
-
-    final layoutType = ResponsiveBreakpoints.of(context).layoutType;
-
-    if (layoutType == MasterDetailLayoutType.mobile) {
-      return super.buildTransitions(
-        context,
-        animation,
-        secondaryAnimation,
-        child,
-      );
-    } else {
-      return FadeTransition(opacity: animation, child: child);
-    }
-  }*/
+    return _transitionBuilder?.call(
+          context,
+          animation,
+          secondaryAnimation,
+          (context) => super.buildTransitions(
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+          ),
+          child,
+        ) ??
+        super.buildTransitions(context, animation, secondaryAnimation, child);
+  }
 
   @override
   Iterable<OverlayEntry> createOverlayEntries() sync* {

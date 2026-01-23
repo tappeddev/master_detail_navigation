@@ -30,17 +30,19 @@ class MasterDetailShell extends StatefulWidget {
   final BoxConstraints Function(MasterDetailLayoutType layoutType)?
   contentConstraintsBuilder;
   final RoutesBuilder? routesBuilder;
+  final double masterSizeRatio;
 
   const MasterDetailShell({
     super.key,
     required this.layoutType,
     required this.detailPlaceholder,
     required this.onDetailsPopped,
+    this.contentConstraintsBuilder,
     this.animationDuration = const Duration(milliseconds: 300),
     this.placeholderFadeDuration = const Duration(milliseconds: 50),
     this.animationCurve = Curves.easeInOut,
-    this.contentConstraintsBuilder,
     this.routesBuilder,
+    this.masterSizeRatio = 0.6,
   });
 
   @override
@@ -111,7 +113,7 @@ class _MasterDetailShellState extends State<MasterDetailShell>
 
     final contentConstraints =
         widget.contentConstraintsBuilder?.call(widget.layoutType) ??
-        MasterDetailLayoutValues.homeContentConstraints(widget.layoutType);
+        const BoxConstraints();
 
     return Align(
       alignment: Alignment.topCenter,
@@ -122,18 +124,15 @@ class _MasterDetailShellState extends State<MasterDetailShell>
             final maxWidth = constraints.maxWidth;
             final maxHeight = constraints.maxHeight;
 
-            const detailRatio = 2;
-            const listRatio = 3;
-            final totalRatio = listRatio + detailRatio;
-
             return AnimatedBuilder(
               animation: hideDetailAnimation,
               builder: (context, _) {
                 final detailExpandScale = hideDetailAnimation.value;
 
-                final detailWidth = (maxWidth * (detailRatio / totalRatio));
-                final masterWidth =
-                    maxWidth - (detailWidth * detailExpandScale);
+                final masterWidth = maxWidth * widget.masterSizeRatio;
+
+                final detailWidth =
+                    (maxWidth - masterWidth) * detailExpandScale;
 
                 final effectiveDetailWidth = widget.layoutType.when(
                   ifMobile: () => constraints.maxWidth,
@@ -218,7 +217,7 @@ class _MasterDetailShellState extends State<MasterDetailShell>
       return AutoRouter.declarative(
         key: _navigatorKey,
         inheritNavigatorObservers: true,
-        routes: (handler) => [],
+        routes: widget.routesBuilder!,
         navigatorObservers: navigatorObservers,
       );
     }
