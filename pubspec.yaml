@@ -5,6 +5,11 @@ environment:
   sdk: ^3.8.1
 
 dependencies:
+  flutter:
+    sdk: flutter
   auto_route: 10.1.2
 
 dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  spot: ^0.18.0
