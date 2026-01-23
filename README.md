@@ -87,7 +87,3 @@ Open detail pages from the master list:
 ```dart
 MasterDetailShell.of(context).openDetails(TodoDetailRoute(id: todo.id));
 ```
-
-## License 📄
-
-MIT. See `LICENSE`.
