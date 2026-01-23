@@ -7,9 +7,16 @@ import 'master_detail_change_observer.dart';
 import 'master_detail_layout.dart';
 import 'responsive_master_detail_data.dart';
 
-/// The [MasterDetailShell] is used to display a master-detail view on
-/// [MasterDetailLayoutType.desktop] and a list with the opened detail view above
-/// it on [MasterDetailLayoutType.mobile].
+/// The [MasterDetailShell] lays out the master and detail routes in a
+/// responsive master-detail UI.
+///
+/// On [MasterDetailLayoutType.desktop], it shows the master list on the left
+/// and the detail panel on the right. On [MasterDetailLayoutType.mobile], the
+/// detail page sits on top of the master.
+///
+/// Sizing is driven by the available constraints. The master width is
+/// `maxWidth * masterSizeRatio`, and the detail width fills the remaining
+/// space. Use [contentConstraintsBuilder] to clamp the overall width/height.
 ///
 /// **Required Parameters:**
 ///
@@ -27,9 +34,15 @@ class MasterDetailShell extends StatefulWidget {
   final Duration animationDuration;
   final Duration placeholderFadeDuration;
   final Curve animationCurve;
+
+  /// Optional constraints applied to the shell before layout.
   final BoxConstraints Function(MasterDetailLayoutType layoutType)?
   contentConstraintsBuilder;
+
+  /// Optional declarative routes builder for the inner [AutoRouter].
   final RoutesBuilder? routesBuilder;
+
+  /// Fraction of available width reserved for the master on desktop.
   final double masterSizeRatio;
 
   const MasterDetailShell({

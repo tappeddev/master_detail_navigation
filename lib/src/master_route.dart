@@ -4,7 +4,25 @@ import 'package:master_detail_navigation/src/responsive_master_detail_data.dart'
 
 import 'non_exclusive_modal_route.dart';
 
+/// A [CustomRoute] for the master/list side of a master-detail UI.
+///
+/// Use this for the route that renders the list (master) inside
+/// `MasterDetailShell`. The page is aligned to the left and sized to
+/// [ResponsiveMasterDetailData.masterWidth], so it stays visible on desktop and
+/// sits underneath the detail page on mobile. It also uses a non-exclusive
+/// modal scope so the master can remain focusable when the detail panel is
+/// visible.
+///
+/// To configure master/detail sizing, see `MasterDetailShell.masterSizeRatio`
+/// and `MasterDetailShell.contentConstraintsBuilder`.
+///
+/// Detail pages are detected by `MasterDetailChangeObserver` when a
+/// `DetailRoute` is pushed on top of a master route.
 class MasterRoute<R extends Object> extends CustomRoute<R> {
+  /// Creates a master route.
+  ///
+  /// Use [wrapChild] to decorate the master widget (e.g., add padding, a
+  /// scaffold, or a vertical separator) without affecting detail routes.
   factory MasterRoute({
     required PageInfo page,
     required String path,
