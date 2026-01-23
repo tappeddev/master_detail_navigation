@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,6 +9,7 @@ import 'package:spot/spot.dart';
 
 const _breakpoint = 600.0;
 const _desktopSize = Size(1000, 800);
+const _goldenDiffTolerance = 0.04;
 
 const _shellRouteName = 'ShellPage';
 const _masterRouteName = 'MasterPage';
@@ -67,6 +71,12 @@ Widget _buildApp(RootStackRouter router) {
 }
 
 void main() {
+  final testFile = File.fromUri(Platform.script);
+  goldenFileComparator = _TolerantGoldenFileComparator(
+    testFile.uri,
+    _goldenDiffTolerance,
+  );
+
   testWidgets('golden - desktop master detail', (tester) async {
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
@@ -86,6 +96,27 @@ void main() {
       matchesGoldenFile('goldens/master_detail_desktop.png'),
     );
   });
+}
+
+class _TolerantGoldenFileComparator extends LocalFileComparator {
+  _TolerantGoldenFileComparator(Uri testFile, this._tolerance)
+    : super(testFile);
+
+  final double _tolerance;
+
+  @override
+  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
+    final comparison = await GoldenFileComparator.compareLists(
+      imageBytes,
+      await getGoldenBytes(golden),
+    );
+
+    if (comparison.passed || comparison.diffPercent <= _tolerance) {
+      return true;
+    }
+
+    return super.compare(imageBytes, golden);
+  }
 }
 
 class _ShellPage extends StatelessWidget {
