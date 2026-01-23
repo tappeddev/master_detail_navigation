@@ -5,30 +5,45 @@ import 'package:master_detail_navigation/src/responsive_master_detail_data.dart'
 import 'non_exclusive_modal_route.dart';
 
 class MasterRoute<R extends Object> extends CustomRoute<R> {
-  MasterRoute({
-    required super.page,
-    required super.path,
-    super.guards,
-    super.initial,
-  }) : super(customRouteBuilder: _buildShiftedRoute);
+  factory MasterRoute({
+    required PageInfo page,
+    required String path,
+    List<AutoRouteGuard> guards = const [],
+    required bool initial,
+    Widget Function(BuildContext context, Widget child)? wrapChild,
+  }) {
+    final customRouteBuilder = <T>(context, child, page) {
+      return _MasterPageRoute<T>(
+        settings: page,
+        builder: (context) {
+          final data = ResponsiveMasterDetailData.of(context);
 
-  static Route<T> _buildShiftedRoute<T>(
-    BuildContext context,
-    Widget child,
-    AutoRoutePage<T> page,
-  ) {
-    return _MasterPageRoute(
-      settings: page,
-      builder: (context) {
-        final data = ResponsiveMasterDetailData.of(context);
-
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(width: data.masterWidth, child: child),
-        );
-      },
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: data.masterWidth,
+              child: wrapChild?.call(context, child) ?? child,
+            ),
+          );
+        },
+      );
+    };
+    return MasterRoute._(
+      path: path,
+      page: page,
+      initial: initial,
+      guards: guards,
+      customRouteBuilder: customRouteBuilder,
     );
   }
+
+  MasterRoute._({
+    required super.page,
+    required super.path,
+    required super.customRouteBuilder,
+    super.guards,
+    super.initial,
+  });
 
   static bool isPageRoute(Route<dynamic>? route) => route is _MasterPageRoute;
 }
