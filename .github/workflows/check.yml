@@ -1,0 +1,32 @@
+name: check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+# Cancel previous builds by only allowing one concurrent build per ref.
+concurrency:
+  group: master_detail_navigation_check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Run format check
+        run: dart format -o none --set-exit-if-changed lib test
+      - name: Run tests
+        run: flutter test

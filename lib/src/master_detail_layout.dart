@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 enum MasterDetailLayoutType { mobile, desktop }
 
 extension MasterDetailLayoutTypeX on MasterDetailLayoutType {

@@ -4,31 +4,64 @@ import 'package:master_detail_navigation/src/responsive_master_detail_data.dart'
 
 import 'non_exclusive_modal_route.dart';
 
+/// A [CustomRoute] for the master/list side of a master-detail UI.
+///
+/// Use this for the route that renders the list (master) inside
+/// `MasterDetailShell`. The page is aligned to the left and sized to
+/// [ResponsiveMasterDetailData.masterWidth], so it stays visible on desktop and
+/// sits underneath the detail page on mobile. It also uses a non-exclusive
+/// modal scope so the master can remain focusable when the detail panel is
+/// visible.
+///
+/// To configure master/detail sizing, see `MasterDetailShell.masterSizeRatio`
+/// and `MasterDetailShell.contentConstraintsBuilder`.
+///
+/// Detail pages are detected by `MasterDetailChangeObserver` when a
+/// `DetailRoute` is pushed on top of a master route.
 class MasterRoute<R extends Object> extends CustomRoute<R> {
-  MasterRoute({
-    required super.page,
-    required super.path,
-    super.guards,
-    super.initial,
-  }) : super(customRouteBuilder: _buildShiftedRoute);
+  /// Creates a master route.
+  ///
+  /// Use [wrapChild] to decorate the master widget (e.g., add padding, a
+  /// scaffold, or a vertical separator) without affecting detail routes.
+  factory MasterRoute({
+    required PageInfo page,
+    required String path,
+    List<AutoRouteGuard> guards = const [],
+    required bool initial,
+    Widget Function(BuildContext context, Widget child)? wrapChild,
+  }) {
+    final customRouteBuilder = <T>(context, child, page) {
+      return _MasterPageRoute<T>(
+        settings: page,
+        builder: (context) {
+          final data = ResponsiveMasterDetailData.of(context);
 
-  static Route<T> _buildShiftedRoute<T>(
-    BuildContext context,
-    Widget child,
-    AutoRoutePage<T> page,
-  ) {
-    return _MasterPageRoute(
-      settings: page,
-      builder: (context) {
-        final data = ResponsiveMasterDetailData.of(context);
-
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(width: data.masterWidth, child: child),
-        );
-      },
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: data.masterWidth,
+              child: wrapChild?.call(context, child) ?? child,
+            ),
+          );
+        },
+      );
+    };
+    return MasterRoute._(
+      path: path,
+      page: page,
+      initial: initial,
+      guards: guards,
+      customRouteBuilder: customRouteBuilder,
     );
   }
+
+  MasterRoute._({
+    required super.page,
+    required super.path,
+    required super.customRouteBuilder,
+    super.guards,
+    super.initial,
+  });
 
   static bool isPageRoute(Route<dynamic>? route) => route is _MasterPageRoute;
 }

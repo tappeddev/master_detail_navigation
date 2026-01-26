@@ -4,7 +4,21 @@ import 'package:master_detail_navigation/src/responsive_master_detail_data.dart'
 
 import 'non_exclusive_modal_route.dart';
 
+/// A [CustomRoute] for detail pages in a master-detail UI.
+///
+/// Use this for pages that show item details when paired with a `MasterRoute`
+/// inside `MasterDetailShell`. The route positions its overlay using
+/// [ResponsiveMasterDetailData.detailX] and
+/// [ResponsiveMasterDetailData.detailWidth], and manages focus/semantics so
+/// details can be hidden on desktop or cover the master on mobile.
+///
+/// To configure master/detail sizing, see `MasterDetailShell.masterSizeRatio`
+/// and `MasterDetailShell.contentConstraintsBuilder`.
+///
+/// Provide [transitionBuilder] or custom durations to control how the detail
+/// page animates.
 class DetailRoute<R extends Object> extends CustomRoute<R> {
+  /// Creates a detail route.
   factory DetailRoute({
     required PageInfo page,
     required String path,
@@ -43,6 +57,10 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
   static bool isPageRoute(Route<dynamic>? route) => route is _DetailPageRoute;
 }
 
+/// Signature for customizing detail transitions.
+///
+/// Use [buildDefaultTransition] to wrap the default material transition if
+/// you only want to add effects on top.
 typedef DetailTransitionBuilder =
     Widget Function(
       BuildContext context,
