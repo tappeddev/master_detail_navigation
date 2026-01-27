@@ -126,6 +126,75 @@ void main() {
     expect(detailBox.size.width, moreOrLessEquals(_mobileSize.width));
     expect(data.isDetailOverMaster, isTrue);
   });
+
+  testWidgets('hideDetails expands master to full width on desktop', (
+    tester,
+  ) async {
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    await tester.binding.setSurfaceSize(_desktopSize);
+
+    final router = _createRouter();
+    await tester.pumpWidget(_buildApp(router));
+    await tester.pumpAndSettle();
+
+    await act.tap(spotText('Open Detail', exact: true));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(_MasterPage));
+    MasterDetailShell.of(context).hideDetails();
+    await tester.pumpAndSettle();
+
+    final data = tester.widget<ResponsiveMasterDetailData>(
+      find.byType(ResponsiveMasterDetailData),
+    );
+
+    expect(data.detailWidth, moreOrLessEquals(0));
+    expect(data.masterWidth, moreOrLessEquals(_desktopSize.width));
+
+    await tester.binding.setSurfaceSize(_mobileSize);
+    await tester.pumpAndSettle();
+
+    spotText('Detail Page', exact: true).existsOnce();
+
+    final mobileData = tester.widget<ResponsiveMasterDetailData>(
+      find.byType(ResponsiveMasterDetailData),
+    );
+    final detailBox =
+        tester.renderObject(find.byKey(_detailContentKey)) as RenderBox;
+    final detailTopLeft = detailBox.localToGlobal(Offset.zero);
+
+    expect(detailTopLeft.dx, moreOrLessEquals(0));
+    expect(detailBox.size.width, moreOrLessEquals(_mobileSize.width));
+    expect(mobileData.isDetailOverMaster, isTrue);
+  });
+
+  testWidgets('hideDetails collapses detail width on desktop', (tester) async {
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    await tester.binding.setSurfaceSize(_desktopSize);
+
+    final router = _createRouter();
+    await tester.pumpWidget(_buildApp(router));
+    await tester.pumpAndSettle();
+
+    await act.tap(spotText('Open Detail', exact: true));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(_MasterPage));
+    MasterDetailShell.of(context).hideDetails();
+    await tester.pumpAndSettle();
+
+    final data = tester.widget<ResponsiveMasterDetailData>(
+      find.byType(ResponsiveMasterDetailData),
+    );
+
+    expect(data.detailWidth, moreOrLessEquals(0));
+  });
 }
 
 class _ShellPage extends StatelessWidget {
