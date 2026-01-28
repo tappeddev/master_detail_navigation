@@ -37,7 +37,7 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
         transitionBuilder: transitionBuilder,
       );
     };
-    return DetailRoute.internal(
+    return DetailRoute._(
       page: page,
       path: path,
       usesPathAsKey: usesPathAsKey,
@@ -46,7 +46,7 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
     );
   }
 
-  DetailRoute.internal({
+  DetailRoute._({
     required super.page,
     required super.path,
     required super.customRouteBuilder,
