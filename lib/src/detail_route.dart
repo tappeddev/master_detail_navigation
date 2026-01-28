@@ -22,8 +22,8 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
   factory DetailRoute({
     required PageInfo page,
     required String path,
-    Duration? transitionDuration,
-    Duration? reverseTransitionDuration,
+    Duration Function(BuildContext context)? transitionDuration,
+    Duration Function(BuildContext context)? reverseTransitionDuration,
     DetailTransitionBuilder? transitionBuilder,
     List<AutoRouteGuard> guards = const [],
     bool usesPathAsKey = false,
@@ -73,14 +73,14 @@ typedef DetailTransitionBuilder =
 class _DetailPageRoute<T> extends PageRouteBuilder<T>
     with MaterialRouteTransitionMixin<T> {
   final WidgetBuilder builder;
-  final Duration? _transitionDuration;
-  final Duration? _reverseTransitionDuration;
+  final Duration Function(BuildContext context)? _transitionDuration;
+  final Duration Function(BuildContext context)? _reverseTransitionDuration;
   final DetailTransitionBuilder? _transitionBuilder;
 
   _DetailPageRoute({
     required this.builder,
-    required Duration? transitionDuration,
-    required Duration? reverseTransitionDuration,
+    required Duration Function(BuildContext context)? transitionDuration,
+    required Duration Function(BuildContext context)? reverseTransitionDuration,
     required DetailTransitionBuilder? transitionBuilder,
     required super.settings,
   }) : _transitionDuration = transitionDuration,
@@ -98,12 +98,24 @@ class _DetailPageRoute<T> extends PageRouteBuilder<T>
   bool get opaque => false;
 
   @override
-  Duration get transitionDuration =>
-      _transitionDuration ?? super.transitionDuration;
+  Duration get transitionDuration {
+    final defaultDuration = super.transitionDuration;
+
+    final context = navigator?.context;
+    if (context == null) return defaultDuration;
+
+    return _transitionDuration?.call(context) ?? defaultDuration;
+  }
 
   @override
-  Duration get reverseTransitionDuration =>
-      _reverseTransitionDuration ?? super.reverseTransitionDuration;
+  Duration get reverseTransitionDuration {
+    final defaultDuration = super.reverseTransitionDuration;
+
+    final context = navigator?.context;
+    if (context == null) return defaultDuration;
+
+    return _reverseTransitionDuration?.call(context) ?? defaultDuration;
+  }
 
   @override
   Widget buildTransitions(
