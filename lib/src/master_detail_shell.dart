@@ -62,7 +62,13 @@ class MasterDetailShell extends StatefulWidget {
   State<MasterDetailShell> createState() => _MasterDetailShellState();
 
   static ResponsiveListDetailController of(BuildContext context) {
-    return context.findAncestorStateOfType<_MasterDetailShellState>()!;
+    final controller = maybeOf(context);
+    assert(controller != null, "MasterDetailShell found in widget tree.");
+    return controller!;
+  }
+
+  static ResponsiveListDetailController? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<_MasterDetailShellState>();
   }
 }
 
