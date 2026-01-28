@@ -57,8 +57,8 @@ RootStackRouter _createRouter() {
           DetailRoute(
             page: _detailPage,
             path: 'detail',
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
+            transitionDuration: (_) => Duration.zero,
+            reverseTransitionDuration: (_) => Duration.zero,
           ),
         ],
       ),
