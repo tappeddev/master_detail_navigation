@@ -142,10 +142,15 @@ class _MasterDetailShellState extends State<MasterDetailShell>
               builder: (context, _) {
                 final detailExpandScale = hideDetailAnimation.value;
 
-                final masterWidth = maxWidth * widget.masterSizeRatio;
+                final baseMasterWidth = maxWidth * widget.masterSizeRatio;
 
                 final detailWidth =
-                    (maxWidth - masterWidth) * detailExpandScale;
+                    (maxWidth - baseMasterWidth) * detailExpandScale;
+
+                final animatedMasterWidth = widget.layoutType.when(
+                  ifMobile: () => constraints.maxWidth,
+                  ifDesktop: () => maxWidth - detailWidth,
+                );
 
                 final effectiveDetailWidth = widget.layoutType.when(
                   ifMobile: () => constraints.maxWidth,
@@ -154,17 +159,14 @@ class _MasterDetailShellState extends State<MasterDetailShell>
 
                 final detailX = widget.layoutType.when(
                   ifMobile: () => 0.0,
-                  ifDesktop: () => masterWidth,
+                  ifDesktop: () => animatedMasterWidth,
                 );
 
                 final detailsInVisibleArea = detailX < maxWidth;
                 final isDetailOverMaster = detailX == 0 && _isDetailsVisible;
 
                 return ResponsiveMasterDetailData(
-                  masterWidth: widget.layoutType.when(
-                    ifMobile: () => constraints.maxWidth,
-                    ifDesktop: () => masterWidth,
-                  ),
+                  masterWidth: animatedMasterWidth,
                   detailWidth: effectiveDetailWidth,
                   detailX: detailX,
                   maxHeight: maxHeight,
