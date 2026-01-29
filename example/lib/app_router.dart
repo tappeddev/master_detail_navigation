@@ -29,24 +29,42 @@ class AppRouter extends RootStackRouter {
             );
           },
         ),
-        DetailRoute(
-          page: TodoDetailRoute.page,
-          path: 'detail/:id',
-          // Use path-based keys so the detail page refreshes when data changes.
-          // Include a unique path param (like the todo id) so the key changes.
-          usesPathAsKey: true,
-          transitionBuilder:
-              (
-                context,
-                animation,
-                secondaryAnimation,
-                buildDefaultTransition,
-                child,
-              ) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-        ),
+        _createDetailRoute(page: TodoDetailRoute.page, path: 'detail/:id'),
       ],
     ),
   ];
+}
+
+DetailRoute<R> _createDetailRoute<R extends Object>({
+  required PageInfo page,
+  required String path,
+  List<AutoRouteGuard> guards = const [],
+  bool withDefaultAnimation = true,
+}) {
+  Duration animationDuration(BuildContext context) {
+    return const Duration(milliseconds: 300);
+  }
+
+  Widget transitionBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    WidgetBuilder buildDefaultTransition,
+    Widget child,
+  ) {
+    if (withDefaultAnimation) {
+      return buildDefaultTransition(context);
+    }
+    return FadeTransition(opacity: animation, child: child);
+  }
+
+  return DetailRoute<R>(
+    path: path,
+    page: page,
+    guards: guards,
+    usesPathAsKey: true,
+    transitionDuration: animationDuration,
+    reverseTransitionDuration: animationDuration,
+    transitionBuilder: transitionBuilder,
+  );
 }

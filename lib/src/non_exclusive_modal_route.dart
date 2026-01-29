@@ -1,53 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 
-class NonExclusiveModalScope<T> extends StatefulWidget {
+class NonExclusiveModalScope<T> extends StatelessWidget {
   const NonExclusiveModalScope({
     super.key,
-    required this.route,
+    required this.builder,
     required this.sortKey,
     required this.isFocusable,
   });
 
-  final PageRouteBuilder<T> route;
+  final WidgetBuilder builder;
   final double sortKey;
   final bool isFocusable;
 
   @override
-  State<NonExclusiveModalScope<T>> createState() =>
-      _NonExclusiveModalScopeState<T>();
-}
-
-class _NonExclusiveModalScopeState<T> extends State<NonExclusiveModalScope<T>> {
-  @override
   Widget build(BuildContext context) {
     return ExcludeSemantics(
-      excluding: !widget.isFocusable,
+      excluding: !isFocusable,
       child: ExcludeFocus(
-        excluding: !widget.isFocusable,
+        excluding: !isFocusable,
         child: Semantics(
-          sortKey: OrdinalSortKey(widget.sortKey),
-          child: _buildModalScopeContent(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildModalScopeContent() {
-    final animation = widget.route.animation ?? kAlwaysCompleteAnimation;
-    final secondaryAnimation =
-        widget.route.secondaryAnimation ?? kAlwaysDismissedAnimation;
-
-    return RepaintBoundary(
-      child: widget.route.buildTransitions(
-        context,
-        animation,
-        secondaryAnimation,
-        RepaintBoundary(
-          child: Builder(
-            builder: (context) =>
-                widget.route.buildPage(context, animation, secondaryAnimation),
-          ),
+          sortKey: OrdinalSortKey(sortKey),
+          child: builder(context),
         ),
       ),
     );
