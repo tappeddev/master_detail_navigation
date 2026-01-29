@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:master_detail_navigation/master_detail_navigation.dart';
 import 'package:master_detail_navigation/src/responsive_master_detail_data.dart';
 
 /// A [CustomRoute] for detail pages in a master-detail UI.
@@ -169,7 +170,11 @@ class _DetailPageRoute<T> extends PageRouteBuilder<T>
                   // focus on the detail page manually.
                   child: Focus(
                     debugLabel: "DetailRouteFocusScope",
-                    child: entry.builder(context),
+                    child: NonExclusiveModalScope(
+                      builder: entry.builder,
+                      sortKey: 1,
+                      isFocusable: true,
+                    ),
                   ),
                 ),
               ),

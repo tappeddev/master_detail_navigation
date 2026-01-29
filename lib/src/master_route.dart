@@ -97,7 +97,7 @@ class _MasterPageRoute<T> extends PageRouteBuilder<T> {
             canRequestFocus: false,
             child: NonExclusiveModalScope(
               sortKey: 0,
-              route: this,
+              builder: entry.builder,
               // Only allow focus of the master layout of
               isFocusable: canRequestFocus,
             ),

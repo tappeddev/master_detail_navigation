@@ -4,12 +4,12 @@ import 'package:flutter/rendering.dart';
 class NonExclusiveModalScope<T> extends StatefulWidget {
   const NonExclusiveModalScope({
     super.key,
-    required this.route,
+    required this.builder,
     required this.sortKey,
     required this.isFocusable,
   });
 
-  final PageRouteBuilder<T> route;
+  final WidgetBuilder builder;
   final double sortKey;
   final bool isFocusable;
 
@@ -27,27 +27,7 @@ class _NonExclusiveModalScopeState<T> extends State<NonExclusiveModalScope<T>> {
         excluding: !widget.isFocusable,
         child: Semantics(
           sortKey: OrdinalSortKey(widget.sortKey),
-          child: _buildModalScopeContent(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildModalScopeContent() {
-    final animation = widget.route.animation ?? kAlwaysCompleteAnimation;
-    final secondaryAnimation =
-        widget.route.secondaryAnimation ?? kAlwaysDismissedAnimation;
-
-    return RepaintBoundary(
-      child: widget.route.buildTransitions(
-        context,
-        animation,
-        secondaryAnimation,
-        RepaintBoundary(
-          child: Builder(
-            builder: (context) =>
-                widget.route.buildPage(context, animation, secondaryAnimation),
-          ),
+          child: widget.builder(context),
         ),
       ),
     );
