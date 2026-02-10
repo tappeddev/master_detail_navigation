@@ -25,6 +25,7 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
     DetailTransitionBuilder? transitionBuilder,
     List<AutoRouteGuard> guards = const [],
     bool usesPathAsKey = false,
+    Map<String, dynamic> meta = const {},
   }) {
     final CustomRouteBuilder customRouteBuilder = <T>(context, child, page) {
       return _DetailPageRoute<T>(
@@ -41,6 +42,7 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
       usesPathAsKey: usesPathAsKey,
       guards: guards,
       customRouteBuilder: customRouteBuilder,
+      meta: meta,
     );
   }
 
@@ -50,6 +52,7 @@ class DetailRoute<R extends Object> extends CustomRoute<R> {
     required super.customRouteBuilder,
     super.guards,
     super.usesPathAsKey,
+    super.meta,
   });
 
   static bool isPageRoute(Route<dynamic>? route) => route is _DetailPageRoute;
