@@ -29,6 +29,7 @@ class MasterRoute<R extends Object> extends CustomRoute<R> {
     List<AutoRouteGuard> guards = const [],
     required bool initial,
     Widget Function(BuildContext context, Widget child)? wrapChild,
+    Map<String, dynamic> meta = const {},
   }) {
     final customRouteBuilder = <T>(context, child, page) {
       return _MasterPageRoute<T>(
@@ -52,6 +53,7 @@ class MasterRoute<R extends Object> extends CustomRoute<R> {
       initial: initial,
       guards: guards,
       customRouteBuilder: customRouteBuilder,
+      meta: meta,
     );
   }
 
@@ -61,6 +63,7 @@ class MasterRoute<R extends Object> extends CustomRoute<R> {
     required super.customRouteBuilder,
     super.guards,
     super.initial,
+    super.meta,
   });
 
   static bool isPageRoute(Route<dynamic>? route) => route is _MasterPageRoute;
