@@ -155,27 +155,37 @@ class _DetailPageRoute<T> extends PageRouteBuilder<T>
           final data = ResponsiveMasterDetailData.of(context);
           final excludeDetails = !data.detailsVisible;
 
+          // 🚧 Without clipping, the default MaterialRoute looks weird,
+          // since the current page fades outside to the left whenever a new page is pushed
+          // only active for [data.isDetailOverMaster]
+          final clipBehavior = data.isDetailOverMaster
+              ? Clip.none
+              : Clip.hardEdge;
+
           return Positioned(
             left: data.detailX,
             top: 0,
             width: data.detailWidth,
             height: data.maxHeight,
-            child: Focus(
-              canRequestFocus: false,
-              debugLabel: "DetailRoute ($this)",
-              child: ExcludeSemantics(
-                excluding: excludeDetails,
-                child: ExcludeFocus(
+            child: ClipRect(
+              clipBehavior: clipBehavior,
+              child: Focus(
+                canRequestFocus: false,
+                debugLabel: "DetailRoute ($this)",
+                child: ExcludeSemantics(
                   excluding: excludeDetails,
-                  // This FocusNodes gives Detail pages the ability to move
-                  // the focus to the root of the page if the layout needs to
-                  // focus on the detail page manually.
-                  child: Focus(
-                    debugLabel: "DetailRouteFocusScope",
-                    child: NonExclusiveModalScope(
-                      builder: entry.builder,
-                      sortKey: 1,
-                      isFocusable: true,
+                  child: ExcludeFocus(
+                    excluding: excludeDetails,
+                    // This FocusNodes gives Detail pages the ability to move
+                    // the focus to the root of the page if the layout needs to
+                    // focus on the detail page manually.
+                    child: Focus(
+                      debugLabel: "DetailRouteFocusScope",
+                      child: NonExclusiveModalScope(
+                        builder: entry.builder,
+                        sortKey: 1,
+                        isFocusable: true,
+                      ),
                     ),
                   ),
                 ),
